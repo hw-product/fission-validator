@@ -3,7 +3,7 @@ require 'carnivore/callback'
 
 module Fission
   module Validator
-    class Github < Carnivore::Callback
+    class Github < Fission::Callback
 
       include Fission::Utils::MessageUnpack
 
@@ -18,7 +18,7 @@ module Fission
         if(user_info && user_info[:validated])
           payload[:user] = {:id => user_info[:id], :account_id => user_info[:account_id]}
           debug "Validated job for user: #{payload[:user].inspect}"
-          Celluloid::Actor["fission_#{payload[:job]}".to_sym].transmit(payload, message)
+          forward(payload, message)
         else
           error "Invalid authentication received: payload: #{payload.inspect} app response: #{user_info.inspect}"
         end
