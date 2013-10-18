@@ -14,8 +14,12 @@ module Fission
 
       def execute(message)
         payload = unpack(message)
-        info "YO, DO STUFF!"
+        payload[:user] = "I'm a big phony"
+        info "User has been validated (stub)"
+        forward(payload)
+        message.confirm!
 =begin
+# NOTE: This is not a real implementation. just some jotted thoughts
         user_info = Celluloid::Actor[:fission_app].user(:github => payload[:github][:repository])
         if(user_info && user_info[:validated])
           payload[:user] = {:id => user_info[:id], :account_id => user_info[:account_id]}
