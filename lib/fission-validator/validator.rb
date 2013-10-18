@@ -14,6 +14,8 @@ module Fission
 
       def execute(message)
         payload = unpack(message)
+        info "YO, DO STUFF!"
+=begin
         user_info = Celluloid::Actor[:fission_app].user(:github => payload[:github][:repository])
         if(user_info && user_info[:validated])
           payload[:user] = {:id => user_info[:id], :account_id => user_info[:account_id]}
@@ -22,6 +24,7 @@ module Fission
         else
           error "Invalid authentication received: payload: #{payload.inspect} app response: #{user_info.inspect}"
         end
+=end
       end
 
     end
