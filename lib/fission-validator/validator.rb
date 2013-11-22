@@ -8,16 +8,16 @@ module Fission
       include Fission::Utils::MessageUnpack
 
       def valid?(message)
-        m = unpack(message)
-        m[:github]
+        super do |m|
+          m[:data] && m[:data][:github] && !m[:data][:user]
+        end
       end
 
       def execute(message)
         payload = unpack(message)
-        payload[:user] = "I'm a big phony"
+        payload[:data][:user] = "I'm a big phony"
         info "User has been validated (stub)"
-        forward(payload)
-        message.confirm!
+        completed(payload, message)
 =begin
 # NOTE: This is not a real implementation. just some jotted thoughts
         user_info = Celluloid::Actor[:fission_app].user(:github => payload[:github][:repository])
@@ -35,4 +35,4 @@ module Fission
   end
 end
 
-Fission.register(:fission_validator, Fission::Validator::Github)
+Fission.register(:validator, :github, Fission::Validator::Github)
