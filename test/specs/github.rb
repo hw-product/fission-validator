@@ -17,6 +17,6 @@ describe 'Fission::Validator::Github' do
     Celluloid::Actor[:validator].transmit(payload_for(:github, :nest => :github))
     source_wait
     result = MessageStore.messages.pop
-    result[:data][:account].wont_be_nil
+    Carnivore::Utils.retrieve(result, :data, :account).wont_be_nil
   end
 end
