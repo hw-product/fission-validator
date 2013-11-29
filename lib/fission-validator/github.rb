@@ -9,13 +9,13 @@ module Fission
 
       def valid?(message)
         super do |m|
-          m[:data] && m[:data][:github] && !m[:data][:user]
+          retreive(m, :data, :github) && !retreive(m, :data, :account)
         end
       end
 
       def execute(message)
         payload = unpack(message)
-        payload[:data][:user] = "I'm a big phony"
+        payload[:data][:account] = "I'm a big phony"
         info "User has been validated (stub)"
         completed(payload, message)
 =begin
