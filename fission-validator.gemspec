@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.description = 'Fission Validator'
   s.require_path = 'lib'
   s.add_dependency 'fission'
-  s.add_dependency 'carnivore'
+  s.add_dependency 'fission-data'
   s.files = Dir['**/*']
 end
