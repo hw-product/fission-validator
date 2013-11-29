@@ -9,7 +9,7 @@ module Fission
 
       def valid?(message)
         super do |m|
-          retreive(m, :data, :github) && !retreive(m, :data, :account)
+          retrieve(m, :data, :github) && !retrieve(m, :data, :account)
         end
       end
 
