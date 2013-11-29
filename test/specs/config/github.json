@@ -1,0 +1,23 @@
+{
+    "fission": {
+        "loaders": {
+            "workers": [
+                "fission-validator"
+            ],
+            "sources": [
+                "carnivore-actor"
+            ]
+        },
+        "sources": {
+            "validator": {
+                "type": "actor"
+            },
+            "test": {
+                "type": "spec"
+            }
+        },
+        "workers": {
+            "validator": 1
+        }
+    }
+}
