@@ -7,6 +7,10 @@ module Fission
 
       include Fission::Utils::MessageUnpack
 
+      def setup
+        require 'fission-data/init'
+      end
+
       def valid?(message)
         super do |m|
           retrieve(m, :data, :github) && !retrieve(m, :data, :account)
@@ -15,20 +19,19 @@ module Fission
 
       def execute(message)
         payload = unpack(message)
-        payload[:data][:account] = "I'm a big phony"
-        info "User has been validated (stub)"
-        completed(payload, message)
-=begin
-# NOTE: This is not a real implementation. just some jotted thoughts
-        user_info = Celluloid::Actor[:fission_app].user(:github => payload[:github][:repository])
-        if(user_info && user_info[:validated])
-          payload[:user] = {:id => user_info[:id], :account_id => user_info[:account_id]}
-          debug "Validated job for user: #{payload[:user].inspect}"
-          forward(payload, message)
+        git_uri = retrieve(payload, :data, :github, :repository, :url)
+        if(git_uri)
+          repository = Fission::Data::Repository.find_by_uri(git_uri)
+          if(repository)
+            debug "Account found for #{message}: #{repository.account.id}"
+            payload[:data][:account] = repository.account.id
+            completed(payload, message)
+          else
+            error(payload, message 'Failed to registered repository using given location'
+          end
         else
-          error "Invalid authentication received: payload: #{payload.inspect} app response: #{user_info.inspect}"
+          error(payload, message, 'No repository location found in payload')
         end
-=end
       end
 
     end
