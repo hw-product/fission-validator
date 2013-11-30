@@ -27,10 +27,10 @@ module Fission
             payload[:data][:account] = repository.account.id
             completed(payload, message)
           else
-            error(payload, message 'Failed to registered repository using given location'
+            failed(payload, message, 'Failed to registered repository using given location')
           end
         else
-          error(payload, message, 'No repository location found in payload')
+          failed(payload, message, 'No repository location found in payload')
         end
       end
 
