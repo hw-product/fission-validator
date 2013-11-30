@@ -21,7 +21,7 @@ module Fission
         payload = unpack(message)
         git_uri = retrieve(payload, :data, :github, :repository, :url)
         if(git_uri)
-          repository = Fission::Data::Repository.find_by_uri(git_uri)
+          repository = Fission::Data::Repository.find_by_url(git_uri)
           if(repository)
             debug "Account found for #{message}: #{repository.account.id}"
             payload[:data][:account] = repository.account.id
