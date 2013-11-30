@@ -6,7 +6,7 @@ describe 'Fission::Validator::Github' do
     @runner = Thread.new do
       require 'fission/runner'
     end
-    source_wait
+    source_wait(:setup)
   end
 
   after do
