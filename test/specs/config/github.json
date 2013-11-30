@@ -1,5 +1,6 @@
 {
     "fission": {
+        "error_handler": "test",
         "loaders": {
             "workers": [
                 "fission-validator"
