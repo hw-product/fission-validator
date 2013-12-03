@@ -1,11 +1,8 @@
-require 'fission/utils'
-require 'carnivore/callback'
+require 'fission/callback'
 
 module Fission
   module Validator
     class Github < Fission::Callback
-
-      include Fission::Utils::MessageUnpack
 
       def setup
         require 'fission-data/init'
@@ -27,7 +24,7 @@ module Fission
             payload[:data][:account] = repository.account.id
             completed(payload, message)
           else
-            failed(payload, message, 'Failed to registered repository using given location')
+            failed(payload, message, 'Failed to locate registered repository using given location')
           end
         else
           failed(payload, message, 'No repository location found in payload')
