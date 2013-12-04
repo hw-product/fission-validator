@@ -20,8 +20,8 @@ module Fission
         if(git_uri)
           repository = Fission::Data::Repository.find_by_url(git_uri)
           if(repository)
-            debug "Account found for #{message}: #{repository.account.id}"
-            payload[:data][:account] = repository.account.id
+            debug "Account found for #{message}: #{repository.owner.id}"
+            payload[:data][:account] = repository.owner.id
             completed(payload, message)
           else
             failed(payload, message, 'Failed to locate registered repository using given location')
