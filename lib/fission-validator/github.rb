@@ -22,6 +22,13 @@ module Fission
           if(repository)
             debug "Account found for #{message}: #{repository.owner.id}"
             payload[:data][:account] = repository.owner.id
+            debug 'Saving job into data store'
+            job = Fission::Data::Job.new(
+              :message_id => payload[:message_id],
+              :payload => payload
+            )
+            job.account = repository.owner
+            job.save
             completed(payload, message)
           else
             failed(payload, message, 'Failed to locate registered repository using given location')
