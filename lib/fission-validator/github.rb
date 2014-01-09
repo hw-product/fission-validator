@@ -18,7 +18,9 @@ module Fission
         payload = unpack(message)
         git_uri = retrieve(payload, :data, :github, :repository, :url)
         if(git_uri)
-          repository = Fission::Data::Repository.find_by_url(git_uri)
+          repository = [git_uri, "#{git_uri}.git"].map do |r_uri|
+            Fission::Data::Repository.find_by_clone_url(r_uri)
+          end.compact.first
           if(repository)
             debug "Account found for #{message}: #{repository.owner.id}"
             payload[:data][:account] = repository.owner.id
