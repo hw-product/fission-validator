@@ -18,9 +18,26 @@ module Fission
         payload = unpack(message)
         git_uri = retrieve(payload, :data, :github, :repository, :url)
         if(git_uri)
-          repository = [git_uri, "#{git_uri}.git"].map do |r_uri|
-            Fission::Data::Repository.find_by_clone_url(r_uri)
-          end.compact.first
+          repository = Fission::Data::Repository.find_by_matching_url(git_uri)
+          unless(repository)
+            account_name = retrieve(payload, :data, :github, :repository, :owner, :name)
+            account = Account.lookup(account_name, :github, :remote)
+            if(account && account.active?)
+              if(account.new?)
+                warn "Discovered previously existing account not in data store. Adding (#{account.inspect})"
+                account.save
+              end
+              info "Unregistered repository encountered for active account: #{account}. Adding."
+              repository = Fission::Data::Repository.new(
+                :name => retrieve(payload, :data, :github, :repository, :name),
+                :source => :github,
+                :url => retrieve(payload, :data, :github, :repository, :url),
+                :clone_url => retrieve(payload, :data, :github, :repository, :url).sub('git:', 'https:')
+              )
+              repository.owner = account
+              repository.save
+            end
+          end
           if(repository)
             debug "Account found for #{message}: #{repository.owner.id}"
             payload[:data][:account] = repository.owner.id
