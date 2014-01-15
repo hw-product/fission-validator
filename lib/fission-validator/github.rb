@@ -6,6 +6,15 @@ module Fission
 
       def setup
         require 'fission-data/init'
+        if(key = Carnivore::Config.get(:fission, :stripe, :secret_key)
+        begin
+          debug 'Attempting to load stripe api library'
+          require 'stripe'
+          info 'Stripe API library loading was successful'
+          Stripe.api_key = key
+        rescue => e
+          debug "Failed to load stripe api library: #{e.class} - #{e}"
+        end
       end
 
       def valid?(message)
