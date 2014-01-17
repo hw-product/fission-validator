@@ -6,14 +6,15 @@ module Fission
 
       def setup
         require 'fission-data/init'
-        if(key = Carnivore::Config.get(:fission, :stripe, :secret_key)
-        begin
-          debug 'Attempting to load stripe api library'
-          require 'stripe'
-          info 'Stripe API library loading was successful'
-          Stripe.api_key = key
-        rescue => e
-          debug "Failed to load stripe api library: #{e.class} - #{e}"
+        if(key = Carnivore::Config.get(:fission, :stripe, :secret_key))
+          begin
+            debug 'Attempting to load stripe api library'
+            require 'stripe'
+            info 'Stripe API library loading was successful'
+            Stripe.api_key = key
+          rescue LoadError => e
+            debug "Failed to load stripe api library: #{e.class} - #{e}"
+          end
         end
       end
 
@@ -30,7 +31,7 @@ module Fission
           repository = Fission::Data::Repository.find_by_matching_url(git_uri)
           unless(repository)
             account_name = retrieve(payload, :data, :github, :repository, :owner, :name)
-            account = Account.lookup(account_name, :github, :remote)
+            account = Fission::Data::Account.lookup(account_name, :github, :remote)
             if(account && account.active?)
               if(account.new?)
                 warn "Discovered previously existing account not in data store. Adding (#{account.inspect})"
@@ -38,8 +39,12 @@ module Fission
               end
               info "Unregistered repository encountered for active account: #{account}. Adding."
               repository = Fission::Data::Repository.new(
-                :name => retrieve(payload, :data, :github, :repository, :name),
+                :name => [
+                  retrieve(payload, :data, :github, :repository, :owner, :name),
+                  retrieve(payload, :data, :github, :repository, :name)
+                ].join('/'),
                 :source => :github,
+                :private => retrieve(payload, :data, :github, :repository, :private),
                 :url => retrieve(payload, :data, :github, :repository, :url),
                 :clone_url => retrieve(payload, :data, :github, :repository, :url).sub('git:', 'https:')
               )
