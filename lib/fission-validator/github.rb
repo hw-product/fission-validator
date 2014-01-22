@@ -54,7 +54,10 @@ module Fission
           end
           if(repository)
             debug "Account found for #{message}: #{repository.owner.id}"
-            payload[:data][:account] = repository.owner.id
+            payload[:data][:account] = {
+              :id => repository.owner.id,
+              :name => repository.owner.name
+            }
             debug 'Saving job into data store'
             job = Fission::Data::Job.new(
               :message_id => payload[:message_id],
