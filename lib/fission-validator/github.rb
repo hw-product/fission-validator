@@ -5,16 +5,20 @@ module Fission
     class Github < Fission::Callback
 
       def setup
-        require 'fission-data/init'
-        if(key = Carnivore::Config.get(:fission, :stripe, :secret_key))
-          begin
-            debug 'Attempting to load stripe api library'
-            require 'stripe'
-            info 'Stripe API library loading was successful'
-            Stripe.api_key = key
-          rescue LoadError => e
-            debug "Failed to load stripe api library: #{e.class} - #{e}"
+        if(enabled?(:data))
+          require 'fission-data/init'
+          if(key = Carnivore::Config.get(:fission, :stripe, :secret_key))
+            begin
+              debug 'Attempting to load stripe api library'
+              require 'stripe'
+              info 'Stripe API library loading was successful'
+              Stripe.api_key = key
+            rescue LoadError => e
+              debug "Failed to load stripe api library: #{e.class} - #{e}"
+            end
           end
+        else
+          warn "Data library is not available. This will impact functionality of this callback!"
         end
       end
 
