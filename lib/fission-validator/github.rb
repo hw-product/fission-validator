@@ -33,7 +33,7 @@ module Fission
           format_payload(payload, :repository, :github)
           git_uri = payload.get(:data, :format, :repository, :url)
           if(git_uri)
-            repository = Fission::Data::Repository.find_by_matching_url(git_uri)
+            repository = Fission::Data::Models::Repository.find_by_matching_url(git_uri)
             unless(repository)
               account_name = payload.get(:data, :format, :repository, :owner_name)
               account = Fission::Data::Account.lookup(account_name, :github, :remote)
