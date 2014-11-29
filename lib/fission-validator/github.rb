@@ -35,18 +35,11 @@ module Fission
           if(git_uri)
             repository = Fission::Data::Models::Repository.find_by_matching_url(git_uri)
             if(repository)
-              debug "Account found for #{message}: #{repository.owner.id}"
+              debug "Account found for #{message}: #{repository.account.id}"
               payload[:data][:account] = {
-                :id => repository.owner.id,
-                :name => repository.owner.name
+                :id => repository.account.id,
+                :name => repository.account.name
               }
-              debug 'Saving job into data store'
-              job = Fission::Data::Job.new(
-                :message_id => payload[:message_id],
-                :payload => payload
-              )
-              job.account = repository.owner
-              job.save
               completed(payload, message)
             else
               failed(payload, message, 'Failed to locate registered repository using given location')
