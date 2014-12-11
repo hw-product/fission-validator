@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.description = 'Fission Validator'
   s.require_path = 'lib'
   s.add_dependency 'fission'
-  s.files = Dir['**/*']
+  s.files = Dir['{lib}/**/**/*'] + %w(fission-validator.gemspec README.md CHANGELOG.md)
 end
