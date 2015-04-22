@@ -41,36 +41,33 @@ module Fission
           )
           if(repository)
             account = repository.account
+            account_config = Smash.new
             if(account.account_configs && !account.account_configs.empty?)
-              account_config = Smash.new.tap do |a_config|
-                account.account_configs.each do |ac|
-                  a_config.deep_merge!(
-                    Smash.new(
-                      ac.service.name => ac.data
-                    )
+              account.account_configs.each do |ac|
+                account_config.deep_merge!(
+                  Smash.new(
+                    ac.service.name => ac.data
                   )
-                end
+                )
               end
-              account_config = Fission::Utils::Cipher.encrypt(
-                MultiJson.dump(account_config),
-                :iv => payload[:message_id],
-                :key => app_config.fetch(:grouping, DEFAULT_SECRET)
-              )
             end
             if(account.routes && !account.routes.empty?)
-              account_routes = Smash[account.routes.find_all(&:valid?).map{|r| [r.name, r.route]}]
-              account_routes = Fission::Utils::Cipher.encrypt(
-                MultiJson.dump(account_routes),
-                :iv => payload[:message_id],
-                :key => app_config.fetch(:grouping, DEFAULT_SECRET)
+              account_config[:router] = Smash.new(
+                :custom_routes => Smash[account.routes.find_all(&:valid?).map{|r| [r.name, r.route]}]
               )
             end
             account_info = Smash.new(
               :id => account.id,
               :name => account.name
             )
-            account_info[:config] = account_config if account_config
-            account_info[:routes] = account_routes if account_routes
+            if(account_config)
+              account_config = Fission::Utils::Cipher.encrypt(
+                MultiJson.dump(account_config),
+                :iv => payload[:message_id],
+                :key => app_config.fetch(:grouping, DEFAULT_SECRET)
+              )
+              account_info[:config] = account_config
+            end
             info "Message validated with account #{account} (#{message})"
             payload.set(:data, :account, account_info)
             job_completed(:validator, payload, message)
