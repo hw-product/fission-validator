@@ -57,11 +57,20 @@ module Fission
                 :key => app_config.fetch(:grouping, DEFAULT_SECRET)
               )
             end
+            if(account.routes && !account.routes.empty?)
+              account_routes = Smash[account.routes.find_all(&:valid?).map{|r| [r.name, r.route]}]
+              account_routes = Fission::Utils::Cipher.encrypt(
+                MultiJson.dump(account_routes),
+                :iv => payload[:message_id],
+                :key => app_config.fetch(:grouping, DEFAULT_SECRET)
+              )
+            end
             account_info = Smash.new(
               :id => account.id,
               :name => account.name
             )
             account_info[:config] = account_config if account_config
+            account_info[:routes] = account_routes if account_routes
             info "Message validated with account #{account} (#{message})"
             payload.set(:data, :account, account_info)
             job_completed(:validator, payload, message)
