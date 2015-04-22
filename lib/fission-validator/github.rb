@@ -44,7 +44,11 @@ module Fission
             if(account.account_configs && !account.account_configs.empty?)
               account_config = Smash.new.tap do |a_config|
                 account.account_configs.each do |ac|
-                  a_config.deep_merge!(ac)
+                  a_config.deep_merge!(
+                    Smash.new(
+                      ac.service.name => ac.data
+                    )
+                  )
                 end
               end
               account_config = Fission::Utils::Cipher.encrypt(
