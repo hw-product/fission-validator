@@ -53,7 +53,8 @@ module Fission
             end
             if(account.routes && !account.routes.empty?)
               account_config[:router] = Smash.new(
-                :custom_routes => Smash[account.routes.find_all(&:valid?).map{|r| [r.name, r.route]}]
+                :custom_routes => Smash[account.routes.find_all(&:valid?).map{|r| [r.name, r.route]}],
+                :custom_services => Smash[account.custom_services_dataset.where(:enabled => true).map{|s| [s.name, s.endpoint]}]
               )
             end
             account_info = Smash.new(
