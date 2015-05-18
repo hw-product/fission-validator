@@ -5,20 +5,7 @@ module Fission
     # Github account validator
     class Github < Fission::Callback
 
-      # Load data store bits
-      def setup(*_)
-        require 'fission-data/init'
-        if(key = app_config.get(:stripe, :secret_key))
-          begin
-            debug 'Attempting to load stripe api library'
-            require 'stripe'
-            info 'Stripe API library loading was successful'
-            Stripe.api_key = key
-          rescue LoadError => e
-            debug "Failed to load stripe api library: #{e.class} - #{e}"
-          end
-        end
-      end
+      include Fission::Validator::Commons
 
       # Determine validity of message
       #
@@ -41,34 +28,7 @@ module Fission
           )
           if(repository)
             account = repository.account
-            account_config = Smash.new
-            if(account.account_configs && !account.account_configs.empty?)
-              account.account_configs.each do |ac|
-                account_config.deep_merge!(
-                  Smash.new(
-                    ac.service.name => ac.data
-                  )
-                )
-              end
-            end
-            if(account.routes && !account.routes.empty?)
-              account_config[:router] = Smash.new(
-                :custom_routes => Smash[account.routes.map{|r| [r.name, r.route]}],
-                :custom_services => Smash[account.custom_services_dataset.where(:enabled => true).map{|s| [s.name, s.endpoint]}]
-              )
-            end
-            account_info = Smash.new(
-              :id => account.id,
-              :name => account.name
-            )
-            if(account_config)
-              account_config = Fission::Utils::Cipher.encrypt(
-                MultiJson.dump(account_config),
-                :iv => payload[:message_id],
-                :key => app_config.fetch(:grouping, DEFAULT_SECRET)
-              )
-              account_info[:config] = account_config
-            end
+            account_info = generate_account_information(account, payload)
             info "Message validated with account #{account} (#{message})"
             payload.set(:data, :account, account_info)
             job_completed(:validator, payload, message)
