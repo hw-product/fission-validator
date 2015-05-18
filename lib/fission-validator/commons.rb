@@ -25,7 +25,7 @@ module Fission
           account_data[:configs][a_config.name] = a_config.data
         end
         account.routes.each do |a_route|
-          account_data[:routes][a_route] = Smash.new(
+          account_data[:custom_routes][a_route] = Smash.new(
             :path => a_route.route,
             :configs => a_route.route_configs.map{|r_config|
               Smash.new(
@@ -52,7 +52,7 @@ module Fission
           :iv => payload[:message_id],
           :key => app_config.fetch(:grouping, DEFAULT_SECRET)
         )
-        account_info[:config] = account_config
+        account_info[:config] = Smash.new(:router => account_data)
         account_info
       end
 
