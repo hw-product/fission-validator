@@ -3,7 +3,7 @@ require 'fission-validator'
 module Fission
   module Validator
     # Common methods
-    class Commons < Fission::Callback
+    module Commons
 
       # Load data store bits
       def setup(*_)
@@ -25,7 +25,7 @@ module Fission
           account_data[:configs][a_config.name] = a_config.data
         end
         account.routes.each do |a_route|
-          account_data[:custom_routes][a_route] = Smash.new(
+          account_data[:custom_routes][a_route.name] = Smash.new(
             :path => a_route.route,
             :configs => a_route.route_configs.map{|r_config|
               Smash.new(
@@ -40,7 +40,7 @@ module Fission
             }
           )
         end
-        account.custom_serivces_dataset.where(:enabled => true).each do |c_service|
+        account.custom_services_dataset.where(:enabled => true).each do |c_service|
           account_data[:custom_services][s.name] = s.endpoint
         end
         account_info = Smash.new(
@@ -50,7 +50,7 @@ module Fission
         account_config = Fission::Utils::Cipher.encrypt(
           MultiJson.dump(account_config),
           :iv => payload[:message_id],
-          :key => app_config.fetch(:grouping, DEFAULT_SECRET)
+          :key => app_config.fetch(:grouping, self.class::DEFAULT_SECRET)
         )
         account_info[:config] = Smash.new(:router => account_data)
         account_info
