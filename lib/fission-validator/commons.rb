@@ -41,18 +41,18 @@ module Fission
           )
         end
         account.custom_services_dataset.where(:enabled => true).each do |c_service|
-          account_data[:custom_services][s.name] = s.endpoint
+          account_data[:custom_services][c_service.name] = c_service.endpoint
         end
         account_info = Smash.new(
           :id => account.id,
           :name => account.name
         )
         account_config = Fission::Utils::Cipher.encrypt(
-          MultiJson.dump(account_config),
+          MultiJson.dump(:router => account_data),
           :iv => payload[:message_id],
           :key => app_config.fetch(:grouping, self.class::DEFAULT_SECRET)
         )
-        account_info[:config] = Smash.new(:router => account_data)
+        account_info[:config] = account_config
         account_info
       end
 
