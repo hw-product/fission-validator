@@ -27,11 +27,24 @@ module Fission
         account.routes.each do |a_route|
           account_data[:custom_routes][a_route.name] = Smash.new(
             :path => a_route.route,
+            :payload_filters => Smash[
+              a_route.route_payload_filters.map{|r_filter|
+                [
+                  r_filter.name,
+                  r_filter.payload_matchers.map{|p_matcher|
+                    Smash.new(
+                      :payload_key => p_matcher.payload_match_rule.payload_key,
+                      :payload_value => p_matcher.value
+                    )
+                  }
+                ]
+              }
+            ],
             :configs => a_route.route_configs.map{|r_config|
               Smash.new(
                 :config_packs => r_config.account_configs.map(&:name),
                 :payload_matchers => r_config.payload_matchers.map{|p_matcher|
-                  Smash(
+                  Smash.new(
                     :payload_key => p_matcher.payload_match_rule.payload_key,
                     :payload_value => p_matcher.value
                   )
