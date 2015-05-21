@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/heavywater/fission-validator'
   s.description = 'Fission Validator'
   s.require_path = 'lib'
-  s.add_dependency 'fission'
+  s.add_dependency 'fission', '>= 0.2.4', '< 1.0.0'
   s.files = Dir['{lib}/**/**/*'] + %w(fission-validator.gemspec README.md CHANGELOG.md)
 end
