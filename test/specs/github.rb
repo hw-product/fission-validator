@@ -1,5 +1,3 @@
-
-Celluloid.logger.level = 1
 describe 'Fission::Validator::Github' do
   before do
     @cwd = File.dirname(__FILE__)
