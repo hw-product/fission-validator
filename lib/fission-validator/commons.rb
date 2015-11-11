@@ -42,6 +42,7 @@ module Fission
             ],
             :configs => a_route.route_configs.map{|r_config|
               Smash.new(
+                :name => r_config.name,
                 :config_packs => r_config.account_configs.map(&:name),
                 :payload_matchers => r_config.payload_matchers.map{|p_matcher|
                   Smash.new(
