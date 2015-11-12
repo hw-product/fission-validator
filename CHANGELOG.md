@@ -1,3 +1,6 @@
+# v0.1.10
+* Store configuration name within payload
+
 # v0.1.8
 * Set custom routing information into payload
 * Set all custom configuration information into payload
