@@ -28,8 +28,8 @@ module Fission
         def repository_name(payload)
           case payload.get(:data, :github, :event)
           when 'pull_request'
-            [payload.get(:data, :github, :pull_request, :head, :repo, :owner, :login),
-              payload.get(:data, :github, :pull_request, :head, :repo, :name)].join('/')
+            [payload.get(:data, :github, :pull_request, :base, :repo, :owner, :login),
+              payload.get(:data, :github, :pull_request, :base, :repo, :name)].join('/')
           when 'push'
             [payload.get(:data, :github, :repository, :owner, :name),
               payload.get(:data, :github, :repository, :name)].join('/')
